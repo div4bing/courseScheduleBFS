@@ -67,13 +67,13 @@ int enqueueNode(int addNode)
        adjQueue.tail = -1;    // Reset Tail
     }
     adjQueue.queue[++adjQueue.tail] = addNode;
-    printf("Enqueued Node: %d on tail: %d \n", adjQueue.queue[adjQueue.tail], adjQueue.tail);
+    // printf("Enqueued Node: %d on tail: %d \n", adjQueue.queue[adjQueue.tail], adjQueue.tail);
     adjQueue.queueCount++;
     return 0;
   }
   else
   {
-    printf("Queue Full\n");
+    // printf("Queue Full\n");
     return -1;
   }
   // printQueue();
@@ -85,12 +85,12 @@ int dequeueNode(void)
 
   if (IsQueueEmpty() == -1)
   {
-    printf("Error! Queue is Empty\n");
+    // printf("Error! Queue is Empty\n");
     return -1;
   }
 
   retHeadNode = adjQueue.queue[adjQueue.head];
-  printf("Dequeued Node: %d on head: %d\n", retHeadNode, adjQueue.head);
+  // printf("Dequeued Node: %d on head: %d\n", retHeadNode, adjQueue.head);
   adjQueue.head++;
 
   if(adjQueue.head == MAX_COURSES)
@@ -119,7 +119,7 @@ int IsQueueEmpty(void)
 {
   if (adjQueue.queueCount == 0)
   {
-    printf("Error! Queue is Empty\n");
+    // printf("Error! Queue is Empty\n");
     return -1;
   }
 
@@ -130,7 +130,7 @@ int IsQueueFull(void)
 {
   if (adjQueue.queueCount == MAX_COURSES)
   {
-    printf("Error! Queue is Full\n");
+    // printf("Error! Queue is Full\n");
     return -1;
   }
 
@@ -155,7 +155,7 @@ int main (int argc, char *argv[])
     adjQueue.head = 0;
     localCurrentHeadNode = currentHeadNode;
 
-    printf("Head Element: %d: \n", currentHeadNode);
+    // printf("Head Element: %d: \n", currentHeadNode);
     if (markDoneVertex[currentHeadNode][0] != 1)  // Current Head is not discovered yet
     {
       if (enqueueNode(currentHeadNode) == -1)
@@ -176,7 +176,7 @@ int main (int argc, char *argv[])
           if (vertex == 0)  // If vertex 0 then start with it else increase from last found vertex and keep searching
           {
             vertex = findNextAdjacentVertex(localCurrentHeadNode, vertex);
-            printf("Vertex: %d\n", vertex);
+            // printf("Vertex: %d\n", vertex);
             if (vertex == -1)
             {
               continue;
@@ -200,7 +200,7 @@ int main (int argc, char *argv[])
           else
           {
             vertex = findNextAdjacentVertex(localCurrentHeadNode, vertex + 1);
-            printf("Vertex: %d\n", vertex);
+            // printf("Vertex: %d\n", vertex);
             if (vertex == -1)
             {
               continue;
@@ -223,13 +223,13 @@ int main (int argc, char *argv[])
 
           if (vertex != -1)
           {
-            printf("--------> %d\n", vertex+1);
+            // printf("--------> %d\n", vertex+1);
           }
         }
         //********************************************************
       }
     }
-    printf("\n");
+    // printf("\n");
   }
 
   printf("TOTAL SEMESTERS REQUIRED IS: %d\n", csSemesterCount+1);
