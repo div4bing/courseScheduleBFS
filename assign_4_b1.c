@@ -146,19 +146,13 @@ int main (int argc, char *argv[])
   int currentHeadNode = 0;
   int localCurrentHeadNode = 0;
   int vertex = 0; // Use to track current adj vertext under current head node
-  int localLevel = 0;
-
-  // vertex = findNextAdjacentVertex(3, vertex) + 1;
-  // printf("Next Element: %d\n", vertex);
 
   // Let's start with vertex 1 which is CS1 and perform the BFS to get max level of nodes
   for (currentHeadNode = 0; currentHeadNode < MAX_COURSES; currentHeadNode++)
   {
-    printf("FOR LOOP\n");
     vertex = 0;     // Reset the vertex
     adjQueue.tail = -1;  // Reset Queue
     adjQueue.head = 0;
-    localLevel = 0;
     localCurrentHeadNode = currentHeadNode;
 
     printf("Head Element: %d: \n", currentHeadNode);
@@ -168,24 +162,17 @@ int main (int argc, char *argv[])
       {
         return -1;
       }
+      markDoneVertex[currentHeadNode][0] = 1;
+      markDoneVertex[currentHeadNode][1] = 0;
 
       while (IsQueueEmpty() != -1)
       {
-        printf("WHILE - 1\n");
         vertex = 0;
         localCurrentHeadNode = dequeueNode();
-        markDoneVertex[localCurrentHeadNode][0] = 1;
-        markDoneVertex[localCurrentHeadNode][1] = localLevel;
-        if (localLevel > csSemesterCount)
-        {
-          csSemesterCount = localLevel;
-        }
-        localLevel++;
 
         //*******************************************************
         while (vertex != -1)   // If no more adj nodes found
         {
-          printf("WHILE - 2\n");
           if (vertex == 0)  // If vertex 0 then start with it else increase from last found vertex and keep searching
           {
             vertex = findNextAdjacentVertex(localCurrentHeadNode, vertex);
@@ -203,10 +190,10 @@ int main (int argc, char *argv[])
               }
 
               markDoneVertex[vertex][0] = 1;
-              markDoneVertex[vertex][1] = localLevel;
-              if (localLevel > csSemesterCount)
+              markDoneVertex[vertex][1] = markDoneVertex[localCurrentHeadNode][1] + 1;
+              if (markDoneVertex[vertex][1] > csSemesterCount)
               {
-                csSemesterCount = localLevel;
+                csSemesterCount = markDoneVertex[vertex][1];
               }
             }
           }
@@ -226,10 +213,10 @@ int main (int argc, char *argv[])
               }
 
               markDoneVertex[vertex][0] = 1;
-              markDoneVertex[vertex][1] = localLevel;
-              if (localLevel > csSemesterCount)
+              markDoneVertex[vertex][1] = markDoneVertex[localCurrentHeadNode][1] + 1;
+              if (markDoneVertex[vertex][1] > csSemesterCount)
               {
-                csSemesterCount = localLevel;
+                csSemesterCount = markDoneVertex[vertex][1];
               }
             }
           }
@@ -245,7 +232,7 @@ int main (int argc, char *argv[])
     printf("\n");
   }
 
-  printf("TOTAL SEMESTER REQUIRED IS: %d\n", csSemesterCount);
+  printf("TOTAL SEMESTERS REQUIRED IS: %d\n", csSemesterCount+1);
 
   return 0;
 }
