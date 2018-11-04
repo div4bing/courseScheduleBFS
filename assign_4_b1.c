@@ -26,10 +26,17 @@ struct AdjQueue
   int queue[MAX_COURSES];
   int head;
   int tail;
+  int queueCount;
 };
 
-int findNextAdjacentVertex(int headVertex, int indexFrom);    // headVertex is the head node and will search next adj from indexFrom
+struct AdjQueue adjQueue;
 
+int findNextAdjacentVertex(int headVertex, int indexFrom);    // headVertex is the head node and will search next adj from indexFrom
+int enqueueNode(int addNode);
+int dequeueNode(void);
+int printQueue(void);
+int IsQueueEmpty(void);
+int IsQueueFull(void);
 
 int findNextAdjacentVertex(int headVertex, int indexFrom)
 {
@@ -51,11 +58,95 @@ int findNextAdjacentVertex(int headVertex, int indexFrom)
   return -1;    // Could not find next adjacent vertex
 }
 
+int enqueueNode(int addNode)
+{
+  if(IsQueueFull() == 0)
+  {
+    if(adjQueue.tail == MAX_COURSES-1)
+    {
+       adjQueue.tail = -1;    // Reset Tail
+    }
+    adjQueue.queue[++adjQueue.tail] = addNode;
+    printf("Enqueued Node: %d on tail: %d \n", adjQueue.queue[adjQueue.tail], adjQueue.tail);
+    adjQueue.queueCount++;
+    return 0;
+  }
+  else
+  {
+    printf("Queue Full\n");
+    return -1;
+  }
+  // printQueue();
+}
+
+int dequeueNode(void)
+{
+  int retHeadNode = 0;
+
+  if (IsQueueEmpty() == -1)
+  {
+    printf("Error! Queue is Empty\n");
+    return -1;
+  }
+
+  retHeadNode = adjQueue.queue[adjQueue.head];
+  printf("Dequeued Node: %d on head: %d\n", retHeadNode, adjQueue.head);
+  adjQueue.head++;
+
+  if(adjQueue.head == MAX_COURSES)
+  {
+    adjQueue.head = 0;
+  }
+
+  adjQueue.queueCount--;
+  // printQueue();
+  return retHeadNode;
+}
+
+int printQueue(void)
+{
+  int i = 0;
+  printf("Printing Queue:\n");
+  for (i = 0; i < MAX_COURSES; i++)
+  {
+    printf(" %d ", adjQueue.queue[i]);
+  }
+  printf("\n");
+  return 0;
+}
+
+int IsQueueEmpty(void)
+{
+  if (adjQueue.queueCount == 0)
+  {
+    printf("Error! Queue is Empty\n");
+    return -1;
+  }
+
+  return 0;
+}
+
+int IsQueueFull(void)
+{
+  if (adjQueue.queueCount == MAX_COURSES)
+  {
+    printf("Error! Queue is Full\n");
+    return -1;
+  }
+
+  return 0;
+}
+
 int main (int argc, char *argv[])
 {
-  struct AdjQueue adjQueue;
+  // Initialze so that we can find bad case
+  adjQueue.head = 0;
+  adjQueue.tail = -1;
+
   int currentHeadNode = 0;
+  int localCurrentHeadNode = 0;
   int vertex = 0; // Use to track current adj vertext under current head node
+  int localLevel = 0;
 
   // vertex = findNextAdjacentVertex(3, vertex) + 1;
   // printf("Next Element: %d\n", vertex);
@@ -63,29 +154,98 @@ int main (int argc, char *argv[])
   // Let's start with vertex 1 which is CS1 and perform the BFS to get max level of nodes
   for (currentHeadNode = 0; currentHeadNode < MAX_COURSES; currentHeadNode++)
   {
+    printf("FOR LOOP\n");
     vertex = 0;     // Reset the vertex
-    printf("Head Element: %d: ", currentHeadNode+1);
+    adjQueue.tail = -1;  // Reset Queue
+    adjQueue.head = 0;
+    localLevel = 0;
+    localCurrentHeadNode = currentHeadNode;
+
+    printf("Head Element: %d: \n", currentHeadNode);
     if (markDoneVertex[currentHeadNode][0] != 1)  // Current Head is not discovered yet
     {
-      while (vertex != -1)   // If no more adj nodes found
+      if (enqueueNode(currentHeadNode) == -1)
       {
-        if (vertex == 0)  // If vertex 0 then start with it else increase from last found vertex and keep searching
+        return -1;
+      }
+
+      while (IsQueueEmpty() != -1)
+      {
+        printf("WHILE - 1\n");
+        vertex = 0;
+        localCurrentHeadNode = dequeueNode();
+        markDoneVertex[localCurrentHeadNode][0] = 1;
+        markDoneVertex[localCurrentHeadNode][1] = localLevel;
+        if (localLevel > csSemesterCount)
         {
-          vertex = findNextAdjacentVertex(currentHeadNode, vertex);
+          csSemesterCount = localLevel;
         }
-        else
+        localLevel++;
+
+        //*******************************************************
+        while (vertex != -1)   // If no more adj nodes found
         {
-          vertex = findNextAdjacentVertex(currentHeadNode, vertex + 1);
+          printf("WHILE - 2\n");
+          if (vertex == 0)  // If vertex 0 then start with it else increase from last found vertex and keep searching
+          {
+            vertex = findNextAdjacentVertex(localCurrentHeadNode, vertex);
+            printf("Vertex: %d\n", vertex);
+            if (vertex == -1)
+            {
+              continue;
+            }
+
+            if (markDoneVertex[vertex][0] != 1)  // Current Head is not discovered yet
+            {
+              if (enqueueNode(vertex) == -1)
+              {
+                return -1;
+              }
+
+              markDoneVertex[vertex][0] = 1;
+              markDoneVertex[vertex][1] = localLevel;
+              if (localLevel > csSemesterCount)
+              {
+                csSemesterCount = localLevel;
+              }
+            }
+          }
+          else
+          {
+            vertex = findNextAdjacentVertex(localCurrentHeadNode, vertex + 1);
+            printf("Vertex: %d\n", vertex);
+            if (vertex == -1)
+            {
+              continue;
+            }
+            if (markDoneVertex[vertex][0] != 1)  // Current Head is not discovered yet
+            {
+              if (enqueueNode(vertex) == -1)
+              {
+                return -1;
+              }
+
+              markDoneVertex[vertex][0] = 1;
+              markDoneVertex[vertex][1] = localLevel;
+              if (localLevel > csSemesterCount)
+              {
+                csSemesterCount = localLevel;
+              }
+            }
+          }
+
+          if (vertex != -1)
+          {
+            printf("--------> %d\n", vertex+1);
+          }
         }
-        if (vertex != -1)
-        {
-          printf("-> %d ", vertex+1);
-        }
+        //********************************************************
       }
     }
     printf("\n");
   }
 
+  printf("TOTAL SEMESTER REQUIRED IS: %d\n", csSemesterCount);
 
   return 0;
 }
